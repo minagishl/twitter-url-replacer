@@ -6,6 +6,12 @@
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "action": {
+    "default_icon": {
+      "16": "src/icons/icon16.png",
+      "19": "src/icons/icon19.png",
+      "38": "src/icons/icon38.png",
+      "128": "src/icons/icon128.png"
+    },
     "default_popup": "src/popup/popup.html",
     "default_title": "Twitter URL Replacer"
   },
@@ -17,5 +23,11 @@
   ],
   "background": {
     "service_worker": "src/background/background.ts"
+  },
+  "icons": {
+    "16": "src/icons/icon16.png",
+    "19": "src/icons/icon19.png",
+    "38": "src/icons/icon38.png",
+    "128": "src/icons/icon128.png"
   }
 }
