@@ -31,11 +31,6 @@ The extension will be available on the Chrome Web Store soon.
 3. Enable "Developer mode" in the top right
 4. Click "Load unpacked" and select the `dist` folder
 
-4. Load the extension in Chrome:
-   - Open `chrome://extensions/` in Chrome
-   - Enable "Developer mode" in the top right
-   - Click "Load unpacked" and select the `dist` folder
-
 ## Usage
 
 ### Basic Usage
