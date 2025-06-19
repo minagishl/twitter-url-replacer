@@ -3,12 +3,14 @@ import browser from 'webextension-polyfill';
 interface Settings {
   selectedDomain: string;
   customDomain: string;
+  showNotifications: boolean;
 }
 
 class TwitterUrlReplacer {
   private settings: Settings = {
     selectedDomain: 'fixupx.com',
     customDomain: '',
+    showNotifications: true,
   };
 
   constructor() {
@@ -21,15 +23,17 @@ class TwitterUrlReplacer {
     this.interceptCopyEvents();
   }
 
-  private async loadSettings() {
+  public async loadSettings() {
     try {
       const result = await browser.storage.sync.get([
         'selectedDomain',
         'customDomain',
+        'showNotifications',
       ]);
       this.settings = {
         selectedDomain: result.selectedDomain || 'fixupx.com',
         customDomain: result.customDomain || '',
+        showNotifications: result.showNotifications !== false, // Default to true
       };
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -180,6 +184,11 @@ class TwitterUrlReplacer {
   }
 
   private showNotification(message: string) {
+    // Only show notification if enabled in settings
+    if (!this.settings.showNotifications) {
+      return;
+    }
+
     // Create a simple notification
     const notification = document.createElement('div');
     notification.textContent = message;
@@ -213,18 +222,23 @@ class TwitterUrlReplacer {
 }
 
 // Initialize the URL replacer when the page loads
+let urlReplacerInstance: TwitterUrlReplacer;
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    new TwitterUrlReplacer();
+    urlReplacerInstance = new TwitterUrlReplacer();
   });
 } else {
-  new TwitterUrlReplacer();
+  urlReplacerInstance = new TwitterUrlReplacer();
 }
 
 // Listen for settings changes
-browser.storage.onChanged.addListener((changes) => {
+browser.storage.onChanged.addListener(async (changes) => {
   if (changes.selectedDomain || changes.customDomain) {
     // Reload the page to apply new settings
     window.location.reload();
+  } else if (changes.showNotifications && urlReplacerInstance) {
+    // Just reload settings for notification changes (no need to reload page)
+    await urlReplacerInstance.loadSettings();
   }
 });

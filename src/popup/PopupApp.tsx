@@ -5,6 +5,7 @@ import browser from 'webextension-polyfill';
 interface Settings {
   selectedDomain: string;
   customDomain: string;
+  showNotifications: boolean;
 }
 
 const PREDEFINED_DOMAINS = [
@@ -17,6 +18,7 @@ export const PopupApp: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({
     selectedDomain: 'fixupx.com',
     customDomain: '',
+    showNotifications: true,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -30,10 +32,12 @@ export const PopupApp: React.FC = () => {
       const result = await browser.storage.sync.get([
         'selectedDomain',
         'customDomain',
+        'showNotifications',
       ]);
       setSettings({
         selectedDomain: result.selectedDomain || 'fixupx.com',
         customDomain: result.customDomain || '',
+        showNotifications: result.showNotifications !== false, // Default to true
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -61,6 +65,11 @@ export const PopupApp: React.FC = () => {
 
   const handleCustomDomainChange = (customDomain: string) => {
     const newSettings = { ...settings, customDomain };
+    saveSettings(newSettings);
+  };
+
+  const handleNotificationToggle = (showNotifications: boolean) => {
+    const newSettings = { ...settings, showNotifications };
     saveSettings(newSettings);
   };
 
@@ -125,6 +134,20 @@ export const PopupApp: React.FC = () => {
             <small>Enter domain without https://</small>
           </div>
         )}
+
+        <div className="notification-settings">
+          <label className="checkbox-option">
+            <input
+              type="checkbox"
+              checked={settings.showNotifications}
+              onChange={(e) => handleNotificationToggle(e.target.checked)}
+              disabled={isSaving}
+            />
+            <span className="checkbox-label">
+              Show notifications when URL is replaced
+            </span>
+          </label>
+        </div>
 
         <div className="footer">
           <p>

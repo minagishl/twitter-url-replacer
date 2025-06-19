@@ -126,6 +126,37 @@ body {
   font-size: 11px;
 }
 
+.notification-settings {
+  padding: 16px;
+  background: #f7f9fa;
+  border-radius: 8px;
+  border: 1px solid #e1e5e9;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.checkbox-option input[type="checkbox"] {
+  margin-right: 12px;
+  accent-color: #1d9bf0;
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-label {
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.4;
+}
+
+.checkbox-option:hover .checkbox-label {
+  color: #1d9bf0;
+}
+
 .footer {
   padding-top: 16px;
   border-top: 1px solid #e1e5e9;
