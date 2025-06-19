@@ -1,0 +1,39 @@
+{
+  "name": "twitter-url-replacer",
+  "version": "1.0.0",
+  "description": "I will replace the domain of the URL copied from the Twitter share button.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "check": "biome check src",
+    "check:write": "biome check --write src",
+    "format": "biome format --write src",
+    "lint": "biome lint src",
+    "lint:write": "biome lint --write src"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@crxjs/vite-plugin": "^2.0.0-beta.25",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
+    "@types/webextension-polyfill": "^0.10.7",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1"
+  },
+  "keywords": [
+    "chrome-extension",
+    "twitter",
+    "x",
+    "url-replacer",
+    "fixupx",
+    "fxtwitter"
+  ],
+  "author": "minagishl",
+  "license": "MIT"
+}

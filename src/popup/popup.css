@@ -1,0 +1,146 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+.popup-container {
+  width: 320px;
+  min-height: 400px;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.header p {
+  font-size: 13px;
+  color: #657786;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.current-setting {
+  padding: 12px;
+  background: #f7f9fa;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.domain-display {
+  color: #1d9bf0;
+  font-weight: 500;
+}
+
+.domain-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.radio-option:hover {
+  border-color: #1d9bf0;
+  background: #f8fcff;
+}
+
+.radio-option input[type="radio"] {
+  margin-right: 12px;
+  accent-color: #1d9bf0;
+}
+
+.radio-label {
+  font-weight: 500;
+  flex: 1;
+}
+
+.domain-url {
+  font-size: 12px;
+  color: #657786;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}
+
+.custom-domain-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f7f9fa;
+  border-radius: 8px;
+}
+
+.custom-domain-input label {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.custom-domain-input input {
+  padding: 8px 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}
+
+.custom-domain-input input:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.1);
+}
+
+.custom-domain-input small {
+  color: #657786;
+  font-size: 11px;
+}
+
+.footer {
+  padding-top: 16px;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+}
+
+.footer p {
+  font-size: 12px;
+  color: #657786;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #657786;
+}
