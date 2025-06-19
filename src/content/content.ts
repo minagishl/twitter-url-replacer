@@ -119,17 +119,29 @@ class TwitterUrlReplacer {
     // Look for copy link buttons in share menus
     const copyLinkSelectors = [
       '[data-testid="copyLinkButton"]',
-      'button:has-text("Copy link")',
       'button[role="menuitem"]',
       '.r-1loqt21', // Another potential Twitter class
+      'button', // Generic button selector to check text content
     ];
 
     for (const selector of copyLinkSelectors) {
       const buttons = document.querySelectorAll(selector);
       for (const button of buttons) {
         if (!button.hasAttribute('data-url-replacer-copy-attached')) {
-          button.setAttribute('data-url-replacer-copy-attached', 'true');
-          button.addEventListener('click', this.handleCopyLinkClick.bind(this));
+          // Check if the button text contains "Copy link" or similar variations
+          const buttonText = button.textContent?.toLowerCase() || '';
+          const issCopyLinkButton =
+            buttonText.includes('copy link') ||
+            buttonText.includes('copy') ||
+            button.getAttribute('data-testid') === 'copyLinkButton';
+
+          if (issCopyLinkButton) {
+            button.setAttribute('data-url-replacer-copy-attached', 'true');
+            button.addEventListener(
+              'click',
+              this.handleCopyLinkClick.bind(this),
+            );
+          }
         }
       }
     }
