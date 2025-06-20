@@ -22,7 +22,7 @@ A Chrome extension that automatically replaces Twitter/X URLs with alternative d
 
 ## Chrome Web Store
 
-The extension will be available on the Chrome Web Store soon.
+You can install this extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/effnfjbmpbdmfggddpglhljnjjecoekk).
 
 ## Manual Installation
 
