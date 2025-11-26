@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Twitter URL Replacer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Replace Twitter/X URLs with alternative domains when sharing links",
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
