@@ -187,12 +187,10 @@ class TwitterUrlReplacer {
       const selection = window.getSelection();
       if (selection?.toString()) {
         const selectedText = selection.toString();
+        const urlObj = new URL(selectedText);
 
         // Check if the selected text is a Twitter/X URL
-        if (
-          selectedText.includes('twitter.com') ||
-          selectedText.includes('x.com')
-        ) {
+        if (urlObj.hostname === 'twitter.com' || urlObj.hostname === 'x.com') {
           const replacedUrl = this.replaceTwitterUrl(selectedText);
 
           if (replacedUrl !== selectedText) {
