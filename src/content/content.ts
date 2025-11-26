@@ -4,6 +4,7 @@ interface Settings {
   selectedDomain: string;
   customDomain: string;
   showNotifications: boolean;
+  removeTrackingParams: boolean;
 }
 
 class TwitterUrlReplacer {
@@ -11,6 +12,7 @@ class TwitterUrlReplacer {
     selectedDomain: 'fixupx.com',
     customDomain: '',
     showNotifications: true,
+    removeTrackingParams: false,
   };
 
   constructor() {
@@ -29,11 +31,13 @@ class TwitterUrlReplacer {
         'selectedDomain',
         'customDomain',
         'showNotifications',
+        'removeTrackingParams',
       ]);
       this.settings = {
         selectedDomain: result.selectedDomain || 'fixupx.com',
         customDomain: result.customDomain || '',
         showNotifications: result.showNotifications !== false, // Default to true
+        removeTrackingParams: result.removeTrackingParams || false, // Default to false
       };
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -54,8 +58,14 @@ class TwitterUrlReplacer {
       if (urlObj.hostname === 'x.com' || urlObj.hostname === 'twitter.com') {
         const replacementDomain = this.getReplacementDomain();
 
+        // Determine search params based on settings
+        let searchParams = urlObj.search;
+        if (this.settings.removeTrackingParams) {
+          searchParams = ''; // Remove all query parameters
+        }
+
         // Ensure the replacement domain has proper protocol
-        const newUrl = `https://${replacementDomain}${urlObj.pathname}${urlObj.search}${urlObj.hash}`;
+        const newUrl = `https://${replacementDomain}${urlObj.pathname}${searchParams}${urlObj.hash}`;
 
         console.log(`Twitter URL Replacer: Replaced ${url} with ${newUrl}`);
         return newUrl;
@@ -246,7 +256,11 @@ if (document.readyState === 'loading') {
 
 // Listen for settings changes
 browser.storage.onChanged.addListener(async (changes) => {
-  if (changes.selectedDomain || changes.customDomain) {
+  if (
+    changes.selectedDomain ||
+    changes.customDomain ||
+    changes.removeTrackingParams
+  ) {
     // Reload the page to apply new settings
     window.location.reload();
   } else if (changes.showNotifications && urlReplacerInstance) {

@@ -6,6 +6,8 @@ browser.runtime.onInstalled.addListener(async (details) => {
     await browser.storage.sync.set({
       selectedDomain: 'fixupx.com',
       customDomain: '',
+      showNotifications: true,
+      removeTrackingParams: false,
     });
 
     console.log(
@@ -25,11 +27,18 @@ browser.runtime.onMessage.addListener(
           const settings = await browser.storage.sync.get([
             'selectedDomain',
             'customDomain',
+            'showNotifications',
+            'removeTrackingParams',
           ]);
           return settings;
         } catch (error) {
           console.error('Error getting settings:', error);
-          return { selectedDomain: 'fixupx.com', customDomain: '' };
+          return {
+            selectedDomain: 'fixupx.com',
+            customDomain: '',
+            showNotifications: true,
+            removeTrackingParams: false,
+          };
         }
 
       case 'updateSettings':

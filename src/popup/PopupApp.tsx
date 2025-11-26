@@ -6,6 +6,7 @@ interface Settings {
   selectedDomain: string;
   customDomain: string;
   showNotifications: boolean;
+  removeTrackingParams: boolean;
 }
 
 const PREDEFINED_DOMAINS = [
@@ -19,6 +20,7 @@ export const PopupApp: React.FC = () => {
     selectedDomain: 'fixupx.com',
     customDomain: '',
     showNotifications: true,
+    removeTrackingParams: false,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -33,11 +35,13 @@ export const PopupApp: React.FC = () => {
         'selectedDomain',
         'customDomain',
         'showNotifications',
+        'removeTrackingParams',
       ]);
       setSettings({
         selectedDomain: result.selectedDomain || 'fixupx.com',
         customDomain: result.customDomain || '',
         showNotifications: result.showNotifications !== false, // Default to true
+        removeTrackingParams: result.removeTrackingParams || false, // Default to false
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -70,6 +74,11 @@ export const PopupApp: React.FC = () => {
 
   const handleNotificationToggle = (showNotifications: boolean) => {
     const newSettings = { ...settings, showNotifications };
+    saveSettings(newSettings);
+  };
+
+  const handleRemoveTrackingParamsToggle = (removeTrackingParams: boolean) => {
+    const newSettings = { ...settings, removeTrackingParams };
     saveSettings(newSettings);
   };
 
@@ -145,6 +154,22 @@ export const PopupApp: React.FC = () => {
             />
             <span className="checkbox-label">
               Show notifications when URL is replaced
+            </span>
+          </label>
+        </div>
+
+        <div className="tracking-settings">
+          <label className="checkbox-option">
+            <input
+              type="checkbox"
+              checked={settings.removeTrackingParams}
+              onChange={(e) =>
+                handleRemoveTrackingParamsToggle(e.target.checked)
+              }
+              disabled={isSaving}
+            />
+            <span className="checkbox-label">
+              Remove all query parameters (tracking, etc.)
             </span>
           </label>
         </div>
