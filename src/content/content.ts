@@ -7,6 +7,9 @@ interface Settings {
   removeTrackingParams: boolean;
 }
 
+const CONFIG_MESSAGE = 'TWITTER_URL_REPLACER_CONFIG';
+const REPLACED_EVENT = 'twitter-url-replacer:replaced';
+
 class TwitterUrlReplacer {
   private settings: Settings = {
     selectedDomain: 'fixupx.com',
@@ -21,8 +24,9 @@ class TwitterUrlReplacer {
 
   private async init() {
     await this.loadSettings();
-    this.observeShareButtons();
+    this.pushConfigToPage();
     this.interceptCopyEvents();
+    this.listenForReplacements();
   }
 
   public async loadSettings() {
@@ -51,20 +55,31 @@ class TwitterUrlReplacer {
     return this.settings.selectedDomain;
   }
 
+  public pushConfigToPage() {
+    window.postMessage(
+      {
+        type: CONFIG_MESSAGE,
+        config: {
+          domain: this.getReplacementDomain(),
+          removeTrackingParams: this.settings.removeTrackingParams,
+        },
+      },
+      '*',
+    );
+  }
+
   private replaceTwitterUrl(url: string): string {
     try {
-      const urlObj = new URL(url);
+      const urlObj = new URL(url.trim());
 
       if (urlObj.hostname === 'x.com' || urlObj.hostname === 'twitter.com') {
         const replacementDomain = this.getReplacementDomain();
 
-        // Determine search params based on settings
         let searchParams = urlObj.search;
         if (this.settings.removeTrackingParams) {
-          searchParams = ''; // Remove all query parameters
+          searchParams = '';
         }
 
-        // Ensure the replacement domain has proper protocol
         const newUrl = `https://${replacementDomain}${urlObj.pathname}${searchParams}${urlObj.hash}`;
 
         console.log(`Twitter URL Replacer: Replaced ${url} with ${newUrl}`);
@@ -77,119 +92,22 @@ class TwitterUrlReplacer {
     return url;
   }
 
-  private observeShareButtons() {
-    // Observer for dynamic content changes
-    const observer = new MutationObserver((mutations) => {
-      for (const _mutation of mutations) {
-        this.attachShareButtonListeners();
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Initial attachment
-    this.attachShareButtonListeners();
-  }
-
-  private attachShareButtonListeners() {
-    // Look for share buttons (these selectors might need adjustment based on Twitter's current DOM structure)
-    const shareSelectors = [
-      '[data-testid="share"]',
-      '[aria-label*="Share"]',
-      '[aria-label*="share"]',
-      'button[role="button"]:has(svg)',
-      '.r-1777fci', // Common Twitter button class (may change)
-    ];
-
-    for (const selector of shareSelectors) {
-      const buttons = document.querySelectorAll(selector);
-      for (const button of buttons) {
-        if (!button.hasAttribute('data-url-replacer-attached')) {
-          button.setAttribute('data-url-replacer-attached', 'true');
-          button.addEventListener(
-            'click',
-            this.handleShareButtonClick.bind(this),
-          );
-        }
-      }
-    }
-  }
-
-  private async handleShareButtonClick() {
-    // Wait a bit for any share menu to appear
-    setTimeout(() => {
-      this.processShareMenu();
-    }, 500);
-  }
-
-  private processShareMenu() {
-    // Look for copy link buttons in share menus
-    const copyLinkSelectors = [
-      '[data-testid="copyLinkButton"]',
-      'button[role="menuitem"]',
-      '.r-1loqt21', // Another potential Twitter class
-      'button', // Generic button selector to check text content
-    ];
-
-    for (const selector of copyLinkSelectors) {
-      const buttons = document.querySelectorAll(selector);
-      for (const button of buttons) {
-        if (!button.hasAttribute('data-url-replacer-copy-attached')) {
-          // Check if the button text contains "Copy link" or similar variations
-          const buttonText = button.textContent?.toLowerCase() || '';
-          const issCopyLinkButton =
-            buttonText.includes('copy link') ||
-            buttonText.includes('copy') ||
-            button.getAttribute('data-testid') === 'copyLinkButton';
-
-          if (issCopyLinkButton) {
-            button.setAttribute('data-url-replacer-copy-attached', 'true');
-            button.addEventListener(
-              'click',
-              this.handleCopyLinkClick.bind(this),
-            );
-          }
-        }
-      }
-    }
-  }
-
-  private async handleCopyLinkClick(event: Event) {
-    // Prevent the default copy action temporarily
-    event.preventDefault();
-    event.stopPropagation();
-
-    try {
-      // Get the current page URL
-      const currentUrl = window.location.href;
-      const replacedUrl = this.replaceTwitterUrl(currentUrl);
-
-      // Copy the replaced URL to clipboard
-      await navigator.clipboard.writeText(replacedUrl);
-
-      // Show a brief notification
+  private listenForReplacements() {
+    window.addEventListener(REPLACED_EVENT, () => {
       this.showNotification('Link copied with replaced domain!');
-    } catch (error) {
-      console.error('Error copying replaced URL:', error);
-      // If our replacement fails, allow the original action to proceed
-      setTimeout(() => {
-        (event.target as HTMLElement).click();
-      }, 0);
-    }
+    });
   }
 
   private interceptCopyEvents() {
-    // Intercept clipboard operations
+    // Intercept selection-based copy (does not go through clipboard.writeText)
     document.addEventListener('copy', (event) => {
       const selection = window.getSelection();
-      if (selection?.toString()) {
-        const selectedText = selection.toString();
+      const selectedText = selection?.toString().trim();
+      if (!selectedText) return;
+
+      try {
         const urlObj = new URL(selectedText);
 
-        // Check if the selected text is a Twitter/X URL
         if (urlObj.hostname === 'twitter.com' || urlObj.hostname === 'x.com') {
           const replacedUrl = this.replaceTwitterUrl(selectedText);
 
@@ -199,17 +117,17 @@ class TwitterUrlReplacer {
             this.showNotification('URL replaced in clipboard!');
           }
         }
+      } catch {
+        // Selected text is not a URL — leave the default copy behavior alone
       }
     });
   }
 
   private showNotification(message: string) {
-    // Only show notification if enabled in settings
     if (!this.settings.showNotifications) {
       return;
     }
 
-    // Create a simple notification
     const notification = document.createElement('div');
     notification.textContent = message;
     notification.style.cssText = `
@@ -229,7 +147,6 @@ class TwitterUrlReplacer {
 
     document.body.appendChild(notification);
 
-    // Remove notification after 3 seconds
     setTimeout(() => {
       notification.style.opacity = '0';
       setTimeout(() => {
@@ -241,7 +158,6 @@ class TwitterUrlReplacer {
   }
 }
 
-// Initialize the URL replacer when the page loads
 let urlReplacerInstance: TwitterUrlReplacer;
 
 if (document.readyState === 'loading') {
@@ -252,17 +168,8 @@ if (document.readyState === 'loading') {
   urlReplacerInstance = new TwitterUrlReplacer();
 }
 
-// Listen for settings changes
-browser.storage.onChanged.addListener(async (changes) => {
-  if (
-    changes.selectedDomain ||
-    changes.customDomain ||
-    changes.removeTrackingParams
-  ) {
-    // Reload the page to apply new settings
-    window.location.reload();
-  } else if (changes.showNotifications && urlReplacerInstance) {
-    // Just reload settings for notification changes (no need to reload page)
-    await urlReplacerInstance.loadSettings();
-  }
+browser.storage.onChanged.addListener(async () => {
+  if (!urlReplacerInstance) return;
+  await urlReplacerInstance.loadSettings();
+  urlReplacerInstance.pushConfigToPage();
 });
